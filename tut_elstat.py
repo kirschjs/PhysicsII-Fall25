@@ -120,14 +120,17 @@ z0, z1 = -15 * rho, 15 * rho
 
 # plot resolution
 numcalcv = 50
+nbrofplanes = 5
 
 X, Y = np.meshgrid(np.linspace(x0, x1, numcalcv),
                    np.linspace(y0, y1, numcalcv),)
 
+zplanes = np.linspace(1, 15, nbrofplanes)
 
-zplane = 0.0
+vContours = [ v_pointsum(X, Y, zplane, charges) for zplane in zplanes]
 
-vContour = v_pointsum(X, Y, zplane, charges)
+levels = np.linspace(np.min(vContours[0]), np.max(vContours[0]), numcalcv)
+
 efield = e_pointsum(X, Y, charges)
 
 
@@ -136,23 +139,30 @@ efield = e_pointsum(X, Y, charges)
 qcol = ['r' if C.q > 0 else 'b' for C in charges]
 lcol = 2 * np.log(np.hypot(efield[0], efield[1]))
 
-fig = plt.figure(figsize=(40, 20))
-ax1 = plt.subplot(121, projection='3d')
+fig = plt.figure(figsize=(5, 5*(nbrofplanes+1)))
 
 
-ax1.plot_surface(X, Y, vContour, alpha=0.5, linewidth=0.3, edgecolor='black')
-ax1.scatter3D(*zip(*[C.pos for C in charges]), c=qcol, s=150)
+
+for nn in range(nbrofplanes):
+    ax1 = plt.subplot(nbrofplanes+1,1, nn+1)
+    ax1.contourf(X, Y, vContours[nn], levels=nn+levels, cmap='RdGy')
+    ax1.set_title(f"electrostatic potential in the z={zplanes[nn]} plane",fontsize=15)
+#ax1.scatter(*zip(*[C.pos[:2] for C in charges]), c=qcol, marker='o', s=150)
+#ax1.plot_surface(X, Y, vContour, alpha=0.5, linewidth=0.3, edgecolor='black')
+#ax1.scatter3D(*zip(*[C.pos for C in charges]), c=qcol, s=150)
+#ax1.set_zlabel(f'V(z={zplane})', labelpad=10, fontsize=22,color='blue')
+
 ax1.set_xlabel('X', labelpad=20, fontsize=22,color='blue')
 ax1.set_ylabel('Y', labelpad=20, fontsize=22,color='blue')
-ax1.set_zlabel(f'V(z={zplane})', labelpad=10, fontsize=22,color='blue')
-ax1.set_title(f"electrostatic potential in the z={zplane} plane",fontsize=32)
 
-ax2 = plt.subplot(122)
+ax2 = plt.subplot(nbrofplanes+1, 1, nbrofplanes+1)
 ax2.streamplot(X, Y, efield[0], efield[1], density=2.0, linewidth=1.0,color=lcol, arrowsize=1.5)
 ax2.scatter(*zip(*[C.pos[:2] for C in charges]), c=qcol, marker='o', s=150)
 ax2.set_xlabel('X', labelpad=20, fontsize=22,color='blue')
 ax2.set_ylabel('Y', labelpad=20, fontsize=22,color='blue')
-ax2.set_title(f"electric field $E=(E_x,E_y)$ in the z={zplane} plane",fontsize=32)
+ax2.set_title(f"electric field $E=(E_x,E_y)$ in the z={zplane*0} plane",fontsize=15)
+
+fig.tight_layout(pad=0.5)
 
 plt.savefig('el_pot.png', dpi=250, bbox_inches="tight", pad_inches=0.02)
 

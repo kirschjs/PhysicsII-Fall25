@@ -70,15 +70,15 @@ def v_pointsum(x, y, z=0, charges=[charge(-1, [0, 0, 0])]):
 # suggestions for charge configurations
 ## ring of charges in the xy-plane (z=0)
 
-nbr = 23
+nbr = 3
 rho = 2
-rhoscale = 14.
+rhoscale = 4.
 zshift = 0.0
 
 qq = 2
 
 ring_charges_z0 = [
-    charge((-1)**nn*qq, [
+    charge((+1)**nn*qq, [
         rhoscale*rho * np.cos(2*np.pi / nbr * nn),
         rhoscale*rho * np.sin(2*np.pi / nbr * nn),
         -zshift
@@ -139,7 +139,7 @@ efield = e_pointsum(X, Y, charges)
 qcol = ['r' if C.q > 0 else 'b' for C in charges]
 lcol = 2 * np.log(np.hypot(efield[0], efield[1]))
 
-fig = plt.figure(figsize=(5, 5*(nbrofplanes+1)))
+fig = plt.figure(figsize=(15, 15*(nbrofplanes+1)))
 
 
 
@@ -160,7 +160,7 @@ ax2.streamplot(X, Y, efield[0], efield[1], density=2.0, linewidth=1.0,color=lcol
 ax2.scatter(*zip(*[C.pos[:2] for C in charges]), c=qcol, marker='o', s=150)
 ax2.set_xlabel('X', labelpad=20, fontsize=22,color='blue')
 ax2.set_ylabel('Y', labelpad=20, fontsize=22,color='blue')
-ax2.set_title(f"electric field $E=(E_x,E_y)$ in the z={zplane*0} plane",fontsize=15)
+ax2.set_title(f"electric field $E=(E_x,E_y)$ in the z={zplanes[0]*0} plane",fontsize=15)
 
 fig.tight_layout(pad=0.5)
 
